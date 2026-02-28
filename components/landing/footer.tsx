@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -7,7 +8,13 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <CATLogo className="h-5 w-auto" />
+            <Image 
+              src="/images/cat-logo.jpg" 
+              alt="CAT" 
+              width={60} 
+              height={24}
+              className="h-5 w-auto brightness-0 invert"
+            />
             <span className="font-heading font-black text-lg text-white">
               Ready
             </span>
@@ -42,33 +49,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function CATLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 80 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      <path
-        d="M0 6C0 2.68629 2.68629 0 6 0H14V6H6V26H14V32H6C2.68629 32 0 29.3137 0 26V6Z"
-        fill="white"
-      />
-      <path
-        d="M24 0H40L50 32H42L40 24H24L22 32H14L24 0Z"
-        fill="white"
-      />
-      <path
-        d="M32 8L26 20H38L32 8Z"
-        fill="#FFCD11"
-      />
-      <path
-        d="M52 0H80V6H70V32H62V6H52V0Z"
-        fill="white"
-      />
-    </svg>
   );
 }
