@@ -64,39 +64,53 @@ export function MagicMoment() {
     offset: ["start end", "end start"],
   });
 
-  // Background color interpolation: cream -> black -> cream
+  // Background color interpolation: cream -> black -> cream (extended range for smoother transition)
   const backgroundColor = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    ["#F4F2EE", "#1a1a1a", "#1a1a1a", "#1a1a1a", "#F4F2EE"]
+    [0, 0.15, 0.35, 0.65, 0.85, 1],
+    ["#F4F2EE", "#F4F2EE", "#1a1a1a", "#1a1a1a", "#F4F2EE", "#F4F2EE"]
+  );
+
+  // Top gradient opacity (fades out as we enter dark zone)
+  const topGradientOpacity = useTransform(
+    scrollYProgress,
+    [0.15, 0.35],
+    [1, 0]
+  );
+
+  // Bottom gradient opacity (fades in as we exit dark zone)
+  const bottomGradientOpacity = useTransform(
+    scrollYProgress,
+    [0.65, 0.85],
+    [0, 1]
   );
 
   // Text color interpolation: black -> white -> black
   const textColor = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    ["#0B0B0B", "#ffffff", "#ffffff", "#ffffff", "#0B0B0B"]
+    [0, 0.15, 0.35, 0.65, 0.85, 1],
+    ["#0B0B0B", "#0B0B0B", "#ffffff", "#ffffff", "#0B0B0B", "#0B0B0B"]
   );
 
   // Muted text color
   const mutedTextColor = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    ["#6b7280", "#9ca3af", "#9ca3af", "#9ca3af", "#6b7280"]
+    [0, 0.15, 0.35, 0.65, 0.85, 1],
+    ["#6b7280", "#6b7280", "#9ca3af", "#9ca3af", "#6b7280", "#6b7280"]
   );
 
   // Card background
   const cardBg = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    ["#e8e6e3", "#2a2a2a", "#2a2a2a", "#2a2a2a", "#e8e6e3"]
+    [0, 0.15, 0.35, 0.65, 0.85, 1],
+    ["#e8e6e3", "#e8e6e3", "#2a2a2a", "#2a2a2a", "#e8e6e3", "#e8e6e3"]
   );
 
   // Inner card background
   const innerCardBg = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    ["#ffffff", "#1a1a1a", "#1a1a1a", "#1a1a1a", "#ffffff"]
+    [0, 0.15, 0.35, 0.65, 0.85, 1],
+    ["#ffffff", "#ffffff", "#1a1a1a", "#1a1a1a", "#ffffff", "#ffffff"]
   );
 
   useEffect(() => {
@@ -144,10 +158,28 @@ export function MagicMoment() {
   return (
     <motion.section 
       ref={sectionRef} 
-      className="py-20 lg:py-32"
+      className="relative py-20 lg:py-32"
       style={{ backgroundColor }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Top feathered gradient overlay */}
+      <motion.div 
+        className="absolute top-0 left-0 right-0 h-32 md:h-48 pointer-events-none"
+        style={{ 
+          opacity: topGradientOpacity,
+          background: "linear-gradient(to bottom, #F4F2EE 0%, #F4F2EE 20%, transparent 100%)"
+        }}
+      />
+      
+      {/* Bottom feathered gradient overlay */}
+      <motion.div 
+        className="absolute bottom-0 left-0 right-0 h-32 md:h-48 pointer-events-none"
+        style={{ 
+          opacity: bottomGradientOpacity,
+          background: "linear-gradient(to top, #F4F2EE 0%, #F4F2EE 20%, transparent 100%)"
+        }}
+      />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.h2 
             className="text-4xl sm:text-5xl md:text-6xl font-black"
