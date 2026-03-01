@@ -141,7 +141,7 @@ export function ValueProps() {
   const headerY = useTransform(scrollYProgress, [0, 0.1], [30, 0]);
 
   return (
-    <section ref={sectionRef} id="features" className="bg-background py-16 md:py-24">
+    <section ref={sectionRef} id="features" className="bg-background pt-24 md:pt-32 pb-16 md:pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-12 md:mb-16"

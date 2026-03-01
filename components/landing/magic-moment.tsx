@@ -103,43 +103,53 @@ export function MagicMoment() {
   };
 
   return (
-    <section className="bg-white py-20 lg:py-32">
+    <section className="relative">
+      {/* Top gradient: cream to black */}
+      <div 
+        className="h-24 md:h-32"
+        style={{
+          background: "linear-gradient(to bottom, hsl(40, 20%, 95%), #1a1a1a)"
+        }}
+      />
+      
+      {/* Dark content area */}
+      <div className="bg-[#1a1a1a] py-20 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-cat-black">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white">
             Speak It. See It. Submit It.
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-4 text-lg text-white/60">
             Your voice becomes a structured report in seconds.
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="bg-cat-gray rounded p-6 sm:p-8 lg:p-12">
+          <div className="bg-[#2a2a2a] rounded-2xl p-6 sm:p-8 lg:p-12">
             <div className="grid lg:grid-cols-2 gap-8">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-3 h-3 rounded-full ${isAnimating ? "bg-cat-red animate-pulse" : "bg-cat-black/20"}`} />
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <div className={`w-3 h-3 rounded-full ${isAnimating ? "bg-cat-red animate-pulse" : "bg-white/20"}`} />
+                  <span className="text-sm font-medium text-white/60">
                     {isAnimating ? "Recording..." : "Tap to record"}
                   </span>
                 </div>
 
-                <div className="bg-white rounded p-4 mb-6 min-h-[80px] flex items-center">
+                <div className="bg-[#1a1a1a] rounded-xl p-4 mb-6 min-h-[80px] flex items-center">
                   {isAnimating ? (
                     <SmoothWaveform />
                   ) : (
-                    <p className="text-sm text-muted-foreground text-center w-full">
+                    <p className="text-sm text-white/40 text-center w-full">
                       Audio waveform will appear here
                     </p>
                   )}
                 </div>
 
-                <div className="bg-white rounded p-4 min-h-[100px]">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">
+                <div className="bg-[#1a1a1a] rounded-xl p-4 min-h-[100px]">
+                  <p className="text-xs font-medium text-white/40 mb-2">
                     TRANSCRIPT
                   </p>
-                  <p className="text-cat-black leading-relaxed">
+                  <p className="text-white leading-relaxed">
                     {displayedText}
                     {isAnimating && displayedText.length < transcriptText.length && (
                       <span className="inline-block w-0.5 h-4 bg-cat-yellow ml-1 animate-pulse" />
@@ -149,8 +159,8 @@ export function MagicMoment() {
 
                 <button
                   onClick={isAnimating ? handleReset : handleStart}
-                  className={`mt-6 w-full py-4 rounded font-bold flex items-center justify-center gap-2 transition-all ${
-                    isAnimating ? "bg-cat-black text-white" : "bg-cat-yellow text-cat-black"
+                  className={`mt-6 w-full py-4 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${
+                    isAnimating ? "bg-white text-cat-black" : "bg-cat-yellow text-cat-black"
                   }`}
                 >
                   <Mic className="h-5 w-5" />
@@ -160,8 +170,8 @@ export function MagicMoment() {
 
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <ArrowRight className="h-4 w-4 text-white/60" />
+                  <span className="text-sm font-medium text-white/60">
                     Auto-generated checklist
                   </span>
                 </div>
@@ -170,16 +180,16 @@ export function MagicMoment() {
                   {checklistItems.map((item, index) => (
                     <div
                       key={item.category}
-                      className={`bg-white rounded p-4 transition-all duration-300 ${
+                      className={`bg-[#1a1a1a] rounded-xl p-4 transition-all duration-300 ${
                         showChecklist && index < activeItems
                           ? "opacity-100 translate-y-0"
                           : "opacity-30 translate-y-2"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-cat-black">{item.category}</span>
+                        <span className="font-bold text-white">{item.category}</span>
                         <span
-                          className={`text-xs font-bold px-2 py-1 rounded ${
+                          className={`text-xs font-bold px-3 py-1 rounded-full ${
                             item.status === "PASS"
                               ? "bg-green-500 text-white"
                               : item.status === "MONITOR"
@@ -190,7 +200,7 @@ export function MagicMoment() {
                           {item.status}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">{item.finding}</p>
+                      <p className="text-sm text-white/60">{item.finding}</p>
                     </div>
                   ))}
                 </div>
@@ -199,6 +209,15 @@ export function MagicMoment() {
           </div>
         </div>
       </div>
+      </div>
+      
+      {/* Bottom gradient: black to cream */}
+      <div 
+        className="h-24 md:h-32"
+        style={{
+          background: "linear-gradient(to bottom, #1a1a1a, hsl(40, 20%, 95%))"
+        }}
+      />
     </section>
   );
 }
