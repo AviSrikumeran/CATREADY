@@ -31,42 +31,49 @@ function StepItem({ step, index, scrollYProgress }: {
   scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
 }) {
   // Calculate the scroll range for this specific step
-  const stepStart = 0.1 + (index * 0.2);
-  const stepMid = stepStart + 0.15;
-  const stepEnd = stepStart + 0.25;
+  const stepStart = 0.1 + (index * 0.25);
+  const stepMid = stepStart + 0.12;
+  const stepEnd = stepStart + 0.22;
 
-  // Step becomes active (black text, full opacity)
-  const opacity = useTransform(
+  // Step becomes active - text goes from gray to black
+  const textOpacity = useTransform(
     scrollYProgress,
-    [stepStart, stepMid, stepEnd, stepEnd + 0.15],
+    [stepStart, stepMid, stepEnd, stepEnd + 0.1],
     [0.3, 1, 1, 0.3]
   );
 
-  // Number opacity - fades in strongly when active
-  const numberOpacity = useTransform(
+  // Icon container goes from gray to YELLOW when active
+  const iconBgOpacity = useTransform(
     scrollYProgress,
-    [stepStart, stepMid, stepEnd, stepEnd + 0.15],
-    [0.03, 0.1, 0.1, 0.03]
+    [stepStart, stepMid, stepEnd, stepEnd + 0.1],
+    [0, 1, 1, 0]
   );
 
   // Y transform for subtle rise effect
   const y = useTransform(
     scrollYProgress,
     [stepStart, stepMid],
-    [20, 0]
+    [15, 0]
   );
 
-  // Scale for the icon
+  // Scale for the icon container
   const iconScale = useTransform(
     scrollYProgress,
-    [stepStart, stepMid, stepEnd, stepEnd + 0.15],
-    [0.9, 1.1, 1.1, 0.9]
+    [stepStart, stepMid, stepEnd, stepEnd + 0.1],
+    [0.95, 1.05, 1.05, 0.95]
+  );
+
+  // Number fades in when active
+  const numberOpacity = useTransform(
+    scrollYProgress,
+    [stepStart, stepMid, stepEnd, stepEnd + 0.1],
+    [0.05, 0.15, 0.15, 0.05]
   );
 
   return (
     <motion.div
       className="relative border-t border-cat-black/10 py-12 lg:py-16"
-      style={{ opacity, y }}
+      style={{ y }}
     >
       <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-16">
         {/* Faded Number */}
@@ -81,7 +88,7 @@ function StepItem({ step, index, scrollYProgress }: {
 
         {/* Mobile Number */}
         <motion.span 
-          className="lg:hidden text-6xl font-black text-cat-black/10"
+          className="lg:hidden text-6xl font-black text-cat-black"
           style={{ opacity: numberOpacity }}
         >
           {step.number}
@@ -89,23 +96,40 @@ function StepItem({ step, index, scrollYProgress }: {
 
         {/* Content */}
         <div className="lg:ml-auto lg:max-w-2xl lg:pl-32 xl:pl-48">
-          {/* Icon */}
-          <motion.div 
-            className="flex items-center justify-center w-14 h-14 bg-cat-yellow rounded mb-6"
-            style={{ scale: iconScale }}
-          >
-            <step.icon className="h-7 w-7 text-cat-black" />
-          </motion.div>
+          {/* Icon - Yellow when active, gray border when inactive */}
+          <div className="relative w-14 h-14 mb-6">
+            {/* Gray border version (always visible, fades when active) */}
+            <motion.div 
+              className="absolute inset-0 flex items-center justify-center bg-white border-2 border-cat-black/20 rounded-2xl"
+              style={{ opacity: useTransform(iconBgOpacity, v => 1 - v) }}
+            >
+              <step.icon className="h-7 w-7 text-cat-black/40" />
+            </motion.div>
+            
+            {/* Yellow version (fades in when active) */}
+            <motion.div 
+              className="absolute inset-0 flex items-center justify-center bg-cat-yellow rounded-2xl"
+              style={{ opacity: iconBgOpacity, scale: iconScale }}
+            >
+              <step.icon className="h-7 w-7 text-cat-black" />
+            </motion.div>
+          </div>
 
           {/* Title */}
-          <h3 className="text-2xl sm:text-3xl font-black text-cat-black mb-4">
+          <motion.h3 
+            className="text-2xl sm:text-3xl font-black text-cat-black mb-4"
+            style={{ opacity: textOpacity }}
+          >
             {step.title}
-          </h3>
+          </motion.h3>
 
           {/* Description */}
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <motion.p 
+            className="text-lg text-muted-foreground leading-relaxed"
+            style={{ opacity: textOpacity }}
+          >
             {step.description}
-          </p>
+          </motion.p>
         </div>
       </div>
     </motion.div>
@@ -120,11 +144,11 @@ export function HowItWorks() {
   });
 
   // Header animation
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [0, 1]);
-  const headerY = useTransform(scrollYProgress, [0, 0.15], [30, 0]);
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+  const headerY = useTransform(scrollYProgress, [0, 0.1], [30, 0]);
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="bg-cat-gray py-20 lg:py-32">
+    <section ref={sectionRef} id="how-it-works" className="bg-background py-20 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div 
