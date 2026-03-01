@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef } from "react";
 import { Clock, ClipboardCheck, Wifi, Wrench, Shield } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const valueProps = [
   {
@@ -36,109 +37,119 @@ const valueProps = [
   },
 ];
 
-export function ValueProps() {
-  const [activeIndex, setActiveIndex] = useState(0);
+function FeatureCard({ 
+  prop, 
+  index, 
+  scrollYProgress 
+}: { 
+  prop: typeof valueProps[0]; 
+  index: number;
+  scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
+}) {
+  // Calculate scroll range for this card
+  const cardStart = 0.1 + (index * 0.12);
+  const cardMid = cardStart + 0.08;
+  const cardEnd = cardStart + 0.15;
+
+  // Card becomes "active" - yellow left border, slight elevation
+  const borderOpacity = useTransform(
+    scrollYProgress,
+    [cardStart, cardMid, cardEnd, cardEnd + 0.08],
+    [0, 1, 1, 0]
+  );
+
+  const cardY = useTransform(
+    scrollYProgress,
+    [cardStart, cardMid],
+    [20, 0]
+  );
+
+  const cardOpacity = useTransform(
+    scrollYProgress,
+    [cardStart, cardMid, cardEnd + 0.1, cardEnd + 0.18],
+    [0.5, 1, 1, 0.5]
+  );
+
+  const elevation = useTransform(
+    scrollYProgress,
+    [cardStart, cardMid, cardEnd, cardEnd + 0.08],
+    [0, 8, 8, 0]
+  );
 
   return (
-    <section id="features" className="bg-cat-gray py-20 lg:py-32">
+    <motion.div
+      className="relative bg-white rounded-2xl p-6 border border-cat-black/10 overflow-hidden"
+      style={{ 
+        y: cardY, 
+        opacity: cardOpacity,
+        boxShadow: useTransform(elevation, v => `0 ${v}px ${v * 2}px rgba(0,0,0,0.08)`)
+      }}
+    >
+      {/* Yellow left border indicator */}
+      <motion.div 
+        className="absolute left-0 top-0 bottom-0 w-1 bg-cat-yellow"
+        style={{ opacity: borderOpacity }}
+      />
+
+      <div className="flex items-start gap-4">
+        {/* Icon */}
+        <motion.div 
+          className="flex items-center justify-center w-12 h-12 bg-cat-yellow rounded-xl shrink-0"
+          style={{ 
+            scale: useTransform(borderOpacity, [0, 1], [0.95, 1.05])
+          }}
+        >
+          <prop.icon className="h-6 w-6 text-cat-black" />
+        </motion.div>
+        
+        <div>
+          <span className="text-xs font-mono text-cat-black/40 block mb-1">
+            {prop.number}
+          </span>
+          <h3 className="text-lg font-black text-cat-black mb-2">
+            {prop.title}
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {prop.description}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+export function ValueProps() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  // Header animation
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.08], [0, 1]);
+  const headerY = useTransform(scrollYProgress, [0, 0.08], [30, 0]);
+
+  return (
+    <section ref={sectionRef} id="features" className="bg-background py-20 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <motion.div 
+          className="text-center mb-16"
+          style={{ opacity: headerOpacity, y: headerY }}
+        >
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-cat-black">
             Why CAT Ready?
           </h2>
-        </div>
+        </motion.div>
 
-        {/* Desktop: Vertical Cards */}
-        <div className="hidden lg:flex gap-4 h-[500px]">
-          {valueProps.map((prop, index) => {
-            const isActive = activeIndex === index;
-            return (
-              <div
-                key={prop.number}
-                className={`relative rounded overflow-hidden cursor-pointer transition-all duration-500 ${
-                  isActive ? "flex-[3]" : "flex-1"
-                }`}
-                onMouseEnter={() => setActiveIndex(index)}
-              >
-                {/* Background */}
-                <div
-                  className={`absolute inset-0 transition-colors duration-300 ${
-                    isActive ? "bg-cat-yellow" : "bg-white border border-cat-black/10"
-                  }`}
-                />
-
-                {/* Content */}
-                <div className="relative h-full p-6 flex flex-col">
-                  {/* Number */}
-                  <span className={`text-sm font-mono ${isActive ? "text-cat-black/60" : "text-cat-black/40"}`}>
-                    {prop.number}
-                  </span>
-
-                  {/* Vertical Title (when collapsed) */}
-                  {!isActive && (
-                    <div className="flex-1 flex items-center justify-center">
-                      <span
-                        className="text-lg font-black text-cat-black whitespace-nowrap"
-                        style={{
-                          writingMode: "vertical-rl",
-                          textOrientation: "mixed",
-                          transform: "rotate(180deg)",
-                        }}
-                      >
-                        {prop.title}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Expanded Content */}
-                  {isActive && (
-                    <div className="flex-1 flex flex-col justify-end">
-                      <prop.icon className="h-10 w-10 text-cat-black mb-4" />
-                      <h3 className="text-2xl font-black text-cat-black mb-4">
-                        {prop.title}
-                      </h3>
-                      <p className="text-cat-black/80 leading-relaxed">
-                        {prop.description}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Icon at bottom (when collapsed) */}
-                  {!isActive && (
-                    <div className="mt-auto">
-                      <prop.icon className="h-6 w-6 text-cat-black/60" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Mobile: Stacked Cards */}
-        <div className="lg:hidden space-y-4">
-          {valueProps.map((prop) => (
-            <div
-              key={prop.number}
-              className="bg-white border border-cat-black/10 rounded p-6"
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-cat-yellow rounded shrink-0">
-                  <prop.icon className="h-6 w-6 text-cat-black" />
-                </div>
-                <div>
-                  <span className="text-xs font-mono text-cat-black/40 block mb-1">
-                    {prop.number}
-                  </span>
-                  <h3 className="text-lg font-black text-cat-black mb-2">
-                    {prop.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {prop.description}
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Cards Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {valueProps.map((prop, index) => (
+            <FeatureCard 
+              key={prop.number} 
+              prop={prop} 
+              index={index}
+              scrollYProgress={scrollYProgress}
+            />
           ))}
         </div>
       </div>

@@ -1,7 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Mic, ArrowRight } from "lucide-react";
+
+// Smooth waveform component with sine-wave based animation
+function SmoothWaveform() {
+  const [bars, setBars] = useState<number[]>(Array(20).fill(25));
+  const frameRef = useRef<number>(0);
+  const startTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    const animate = () => {
+      const elapsed = (Date.now() - startTimeRef.current) / 1000; // seconds
+      
+      const newBars = Array(20).fill(0).map((_, i) => {
+        // Multiple sine waves layered for organic feel
+        const wave1 = Math.sin(elapsed * 1.5 + i * 0.4) * 12;
+        const wave2 = Math.sin(elapsed * 2.3 + i * 0.25) * 8;
+        const wave3 = Math.sin(elapsed * 0.8 + i * 0.6) * 5;
+        
+        // Center bars slightly taller
+        const centerBoost = Math.sin((i / 19) * Math.PI) * 10;
+        
+        return Math.max(8, 25 + wave1 + wave2 + wave3 + centerBoost);
+      });
+      
+      setBars(newBars);
+      frameRef.current = requestAnimationFrame(animate);
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-1 w-full justify-center h-16">
+      {bars.map((height, i) => (
+        <div
+          key={i}
+          className="w-1 bg-cat-yellow rounded-full transition-all duration-150 ease-out"
+          style={{ height: `${height}px` }}
+        />
+      ))}
+    </div>
+  );
+}
 
 const transcriptText = "Left track tensioner showing minor hydraulic seepage. Recommend monitoring over next 48 hours.";
 
@@ -84,18 +127,7 @@ export function MagicMoment() {
 
                 <div className="bg-white rounded p-4 mb-6 min-h-[80px] flex items-center">
                   {isAnimating ? (
-                    <div className="flex items-center gap-1 w-full justify-center">
-                      {[...Array(20)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="w-1 bg-cat-yellow rounded-full animate-pulse"
-                          style={{
-                            height: `${Math.random() * 40 + 20}px`,
-                            animationDelay: `${i * 50}ms`,
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <SmoothWaveform />
                   ) : (
                     <p className="text-sm text-muted-foreground text-center w-full">
                       Audio waveform will appear here

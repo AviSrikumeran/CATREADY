@@ -6,15 +6,16 @@
   :root {
     /* CAT Ready Color System */
     --cat-yellow: 45 100% 53%; /* #FFCD11 */
-    --cat-black: 0 0% 10%; /* #1A1A1A */
+    --cat-black: 0 0% 7%; /* #0B0B0B - near black */
     --cat-red: 357 76% 49%; /* #DE1F26 */
     --cat-white: 0 0% 100%; /* #FFFFFF */
     --cat-gray: 40 7% 95%; /* #F5F5F3 - warm gray */
     --cat-gray-dark: 40 5% 90%; /* #E8E6E3 - darker warm gray */
+    --cat-cream: 40 20% 95%; /* #F4F2EE - pastel off-white */
 
     /* Semantic tokens */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    --background: 40 20% 95%; /* #F4F2EE - pastel cream */
+    --foreground: 0 0% 7%; /* #0B0B0B */
 
     --card: 40 7% 95%;
     --card-foreground: 0 0% 10%;
@@ -95,13 +96,13 @@
     @apply bg-cat-red text-white;
   }
 
-  /* Industrial button */
+  /* Industrial button - pill style */
   .btn-primary {
-    @apply bg-cat-yellow text-cat-black font-bold px-6 py-3 rounded transition-all hover:brightness-95 active:scale-[0.98];
+    @apply bg-cat-yellow text-cat-black font-bold px-8 py-4 rounded-full transition-all hover:brightness-95 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply bg-cat-black text-white font-bold px-6 py-3 rounded transition-all hover:bg-opacity-90 active:scale-[0.98];
+    @apply bg-cat-black text-white font-bold px-8 py-4 rounded-full transition-all hover:bg-opacity-90 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98];
   }
 
   /* Faded background numbers */
@@ -151,5 +152,9 @@
 
   .border-cat-black {
     border-color: hsl(var(--cat-black));
+  }
+
+  .bg-cat-cream {
+    background-color: hsl(var(--cat-cream));
   }
 }
