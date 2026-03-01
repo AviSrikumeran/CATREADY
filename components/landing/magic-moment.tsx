@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Mic, ArrowRight } from "lucide-react";
 
 // Smooth waveform component with sine-wave based animation
@@ -11,17 +12,13 @@ function SmoothWaveform() {
 
   useEffect(() => {
     const animate = () => {
-      const elapsed = (Date.now() - startTimeRef.current) / 1000; // seconds
+      const elapsed = (Date.now() - startTimeRef.current) / 1000;
       
       const newBars = Array(20).fill(0).map((_, i) => {
-        // Multiple sine waves layered for organic feel
         const wave1 = Math.sin(elapsed * 1.5 + i * 0.4) * 12;
         const wave2 = Math.sin(elapsed * 2.3 + i * 0.25) * 8;
         const wave3 = Math.sin(elapsed * 0.8 + i * 0.6) * 5;
-        
-        // Center bars slightly taller
         const centerBoost = Math.sin((i / 19) * Math.PI) * 10;
-        
         return Math.max(8, 25 + wave1 + wave2 + wave3 + centerBoost);
       });
       
@@ -55,10 +52,52 @@ const checklistItems = [
 ];
 
 export function MagicMoment() {
+  const sectionRef = useRef<HTMLElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [displayedText, setDisplayedText] = useState("");
   const [showChecklist, setShowChecklist] = useState(false);
   const [activeItems, setActiveItems] = useState(0);
+
+  // Scroll-linked background transition
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  // Background color interpolation: cream -> black -> cream
+  const backgroundColor = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    ["#F4F2EE", "#1a1a1a", "#1a1a1a", "#1a1a1a", "#F4F2EE"]
+  );
+
+  // Text color interpolation: black -> white -> black
+  const textColor = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    ["#0B0B0B", "#ffffff", "#ffffff", "#ffffff", "#0B0B0B"]
+  );
+
+  // Muted text color
+  const mutedTextColor = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    ["#6b7280", "#9ca3af", "#9ca3af", "#9ca3af", "#6b7280"]
+  );
+
+  // Card background
+  const cardBg = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    ["#e8e6e3", "#2a2a2a", "#2a2a2a", "#2a2a2a", "#e8e6e3"]
+  );
+
+  // Inner card background
+  const innerCardBg = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    ["#ffffff", "#1a1a1a", "#1a1a1a", "#1a1a1a", "#ffffff"]
+  );
 
   useEffect(() => {
     if (!isAnimating) return;
@@ -103,59 +142,80 @@ export function MagicMoment() {
   };
 
   return (
-    <section className="relative">
-      {/* Top gradient: cream to black */}
-      <div 
-        className="h-24 md:h-32"
-        style={{
-          background: "linear-gradient(to bottom, hsl(40, 20%, 95%), #1a1a1a)"
-        }}
-      />
-      
-      {/* Dark content area */}
-      <div className="bg-[#1a1a1a] py-20 lg:py-32">
+    <motion.section 
+      ref={sectionRef} 
+      className="py-20 lg:py-32"
+      style={{ backgroundColor }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white">
+          <motion.h2 
+            className="text-4xl sm:text-5xl md:text-6xl font-black"
+            style={{ color: textColor }}
+          >
             Speak It. See It. Submit It.
-          </h2>
-          <p className="mt-4 text-lg text-white/60">
+          </motion.h2>
+          <motion.p 
+            className="mt-4 text-lg"
+            style={{ color: mutedTextColor }}
+          >
             Your voice becomes a structured report in seconds.
-          </p>
+          </motion.p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="bg-[#2a2a2a] rounded-2xl p-6 sm:p-8 lg:p-12">
+          <motion.div 
+            className="rounded-2xl p-6 sm:p-8 lg:p-12"
+            style={{ backgroundColor: cardBg }}
+          >
             <div className="grid lg:grid-cols-2 gap-8">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-3 h-3 rounded-full ${isAnimating ? "bg-cat-red animate-pulse" : "bg-white/20"}`} />
-                  <span className="text-sm font-medium text-white/60">
+                  <div className={`w-3 h-3 rounded-full ${isAnimating ? "bg-cat-red animate-pulse" : "bg-gray-400"}`} />
+                  <motion.span 
+                    className="text-sm font-medium"
+                    style={{ color: mutedTextColor }}
+                  >
                     {isAnimating ? "Recording..." : "Tap to record"}
-                  </span>
+                  </motion.span>
                 </div>
 
-                <div className="bg-[#1a1a1a] rounded-xl p-4 mb-6 min-h-[80px] flex items-center">
+                <motion.div 
+                  className="rounded-xl p-4 mb-6 min-h-[80px] flex items-center"
+                  style={{ backgroundColor: innerCardBg }}
+                >
                   {isAnimating ? (
                     <SmoothWaveform />
                   ) : (
-                    <p className="text-sm text-white/40 text-center w-full">
+                    <motion.p 
+                      className="text-sm text-center w-full"
+                      style={{ color: mutedTextColor }}
+                    >
                       Audio waveform will appear here
-                    </p>
+                    </motion.p>
                   )}
-                </div>
+                </motion.div>
 
-                <div className="bg-[#1a1a1a] rounded-xl p-4 min-h-[100px]">
-                  <p className="text-xs font-medium text-white/40 mb-2">
+                <motion.div 
+                  className="rounded-xl p-4 min-h-[100px]"
+                  style={{ backgroundColor: innerCardBg }}
+                >
+                  <motion.p 
+                    className="text-xs font-medium mb-2"
+                    style={{ color: mutedTextColor }}
+                  >
                     TRANSCRIPT
-                  </p>
-                  <p className="text-white leading-relaxed">
+                  </motion.p>
+                  <motion.p 
+                    className="leading-relaxed"
+                    style={{ color: textColor }}
+                  >
                     {displayedText}
                     {isAnimating && displayedText.length < transcriptText.length && (
                       <span className="inline-block w-0.5 h-4 bg-cat-yellow ml-1 animate-pulse" />
                     )}
-                  </p>
-                </div>
+                  </motion.p>
+                </motion.div>
 
                 <button
                   onClick={isAnimating ? handleReset : handleStart}
@@ -170,24 +230,35 @@ export function MagicMoment() {
 
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <ArrowRight className="h-4 w-4 text-white/60" />
-                  <span className="text-sm font-medium text-white/60">
+                  <motion.div style={{ color: mutedTextColor }}>
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.div>
+                  <motion.span 
+                    className="text-sm font-medium"
+                    style={{ color: mutedTextColor }}
+                  >
                     Auto-generated checklist
-                  </span>
+                  </motion.span>
                 </div>
 
                 <div className="space-y-3">
                   {checklistItems.map((item, index) => (
-                    <div
+                    <motion.div
                       key={item.category}
-                      className={`bg-[#1a1a1a] rounded-xl p-4 transition-all duration-300 ${
+                      className={`rounded-xl p-4 transition-all duration-300 ${
                         showChecklist && index < activeItems
                           ? "opacity-100 translate-y-0"
                           : "opacity-30 translate-y-2"
                       }`}
+                      style={{ backgroundColor: innerCardBg }}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-white">{item.category}</span>
+                        <motion.span 
+                          className="font-bold"
+                          style={{ color: textColor }}
+                        >
+                          {item.category}
+                        </motion.span>
                         <span
                           className={`text-xs font-bold px-3 py-1 rounded-full ${
                             item.status === "PASS"
@@ -200,24 +271,20 @@ export function MagicMoment() {
                           {item.status}
                         </span>
                       </div>
-                      <p className="text-sm text-white/60">{item.finding}</p>
-                    </div>
+                      <motion.p 
+                        className="text-sm"
+                        style={{ color: mutedTextColor }}
+                      >
+                        {item.finding}
+                      </motion.p>
+                    </motion.div>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-      </div>
-      
-      {/* Bottom gradient: black to cream */}
-      <div 
-        className="h-24 md:h-32"
-        style={{
-          background: "linear-gradient(to bottom, #1a1a1a, hsl(40, 20%, 95%))"
-        }}
-      />
-    </section>
+    </motion.section>
   );
 }
