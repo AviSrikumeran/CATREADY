@@ -41,6 +41,12 @@ export function Header() {
               Features
             </Link>
             <Link
+              href="/admin"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Admin
+            </Link>
+            <Link
               href="/inspect"
               className="btn-primary text-sm px-4 py-2"
             >
@@ -79,6 +85,13 @@ export function Header() {
                 onClick={() => setMenuOpen(false)}
               >
                 Features
+              </Link>
+              <Link
+                href="/admin"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Admin
               </Link>
               <Link
                 href="/inspect"
